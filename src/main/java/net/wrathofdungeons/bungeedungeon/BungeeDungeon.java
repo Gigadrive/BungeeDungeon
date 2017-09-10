@@ -23,7 +23,6 @@ public class BungeeDungeon extends Plugin {
 
     public void onEnable(){
         instance = this;
-
         saveDefaultConfig();
 
         try {
@@ -31,6 +30,10 @@ public class BungeeDungeon extends Plugin {
         } catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void onDisable(){
+        MySQLManager.getInstance().unload();
     }
 
     public static BungeeDungeon getInstance() {
