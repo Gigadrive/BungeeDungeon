@@ -10,6 +10,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import net.wrathofdungeons.bungeedungeon.listener.PingListener;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -20,9 +21,11 @@ import java.util.Random;
 public class BungeeDungeon extends Plugin {
     private static BungeeDungeon instance;
     private Configuration config;
+    private static MotdManager motdManager;
 
     public void onEnable(){
         instance = this;
+        motdManager = new MotdManager();
         saveDefaultConfig();
 
         try {
@@ -30,10 +33,27 @@ public class BungeeDungeon extends Plugin {
         } catch(Exception e){
             e.printStackTrace();
         }
+
+        motdManager.loadFromDatabase();
+
+        registerListeners();
+        registerCommands();
+    }
+
+    private void registerListeners(){
+        getProxy().getPluginManager().registerListener(this, new PingListener());
+    }
+
+    private void registerCommands(){
+
     }
 
     public void onDisable(){
         MySQLManager.getInstance().unload();
+    }
+
+    public static MotdManager getMotdManager(){
+        return motdManager;
     }
 
     public static BungeeDungeon getInstance() {
