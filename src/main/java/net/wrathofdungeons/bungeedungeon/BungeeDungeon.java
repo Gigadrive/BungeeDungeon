@@ -1,8 +1,6 @@
 package net.wrathofdungeons.bungeedungeon;
 
 import com.google.common.io.ByteStreams;
-import de.dytanic.cloudnet.api.CloudNetAPI;
-import de.dytanic.cloudnet.bukkitproxy.api.CloudProxy;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -121,61 +119,6 @@ public class BungeeDungeon extends Plugin {
             return 1;
         } else {
             return 0;
-        }
-    }
-
-    public ServerInfo getBestLobby(ProxiedPlayer p){
-        ArrayList<de.dytanic.cloudnet.network.ServerInfo> a = new ArrayList<de.dytanic.cloudnet.network.ServerInfo>();
-
-        for(de.dytanic.cloudnet.network.ServerInfo info : CloudNetAPI.getInstance().getCloudNetwork().getServers().values()){
-            if(info.getGroup().equalsIgnoreCase("PremiumLobby") && info.getMaxPlayers() > info.getOnlineCount()){
-                a.add(info);
-            }
-        }
-
-        if(a.size() == 0){
-            return null;
-        } else if(a.size() == 1){
-            return ProxyServer.getInstance().getServerInfo(a.get(0).getName());
-        } else {
-            Collections.sort(a, new Comparator<de.dytanic.cloudnet.network.ServerInfo>() {
-                public int compare(de.dytanic.cloudnet.network.ServerInfo p1, de.dytanic.cloudnet.network.ServerInfo p2) {
-                    return ((Integer)p1.getOnlineCount()).compareTo(((Integer)p2.getOnlineCount()));
-                }
-            });
-
-            return ProxyServer.getInstance().getServerInfo(a.get(0).getName());
-        }
-    }
-
-    public static de.dytanic.cloudnet.network.ServerInfo getBestServer(String group){
-        return getBestServer(group,0);
-    }
-
-    public static de.dytanic.cloudnet.network.ServerInfo getBestServer(String group, int minFreeSlots){
-        ArrayList<de.dytanic.cloudnet.network.ServerInfo> potentials = new ArrayList<de.dytanic.cloudnet.network.ServerInfo>();
-
-        for(de.dytanic.cloudnet.network.ServerInfo info : CloudNetAPI.getInstance().getCloudNetwork().getServers().values()){
-            int freeSlots = info.getMaxPlayers()-info.getOnlineCount();
-
-            if(info.getGroup().equalsIgnoreCase(group) && freeSlots >= minFreeSlots){
-                potentials.add(info);
-            }
-        }
-
-        if(potentials.size() == 0){
-            return null;
-        } else if(potentials.size() == 1){
-            return potentials.get(0);
-        } else {
-            Collections.sort(potentials, new Comparator<de.dytanic.cloudnet.network.ServerInfo>() {
-                @Override
-                public int compare(de.dytanic.cloudnet.network.ServerInfo o1, de.dytanic.cloudnet.network.ServerInfo o2) {
-                    return ((Integer)o1.getOnlineCount()).compareTo(((Integer)o2.getOnlineCount()));
-                }
-            });
-
-            return potentials.get(0);
         }
     }
 
