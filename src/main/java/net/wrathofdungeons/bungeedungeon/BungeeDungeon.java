@@ -11,6 +11,7 @@ import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 import net.wrathofdungeons.bungeedungeon.listener.PingListener;
+import net.wrathofdungeons.bungeedungeon.tasks.ReloadCachesTask;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ public class BungeeDungeon extends Plugin {
 
         registerListeners();
         registerCommands();
+
+        ReloadCachesTask._do();
     }
 
     private void registerListeners(){
