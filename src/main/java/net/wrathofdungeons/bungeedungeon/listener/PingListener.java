@@ -17,10 +17,9 @@ public class PingListener implements Listener {
         ServerPing response = e.getResponse();
 
         String[] hoverInfo = new String[]{
-                ChatColor.GOLD.toString() + ChatColor.BOLD.toString() + "TheChest.eu",
+                ChatColor.RED.toString() + ChatColor.BOLD.toString() + "Wrath of Dungeons",
                 "",
-                ChatColor.YELLOW + "Website: " + ChatColor.AQUA + "https://thechest.eu",
-                ChatColor.YELLOW + "TeamSpeak3: " + ChatColor.AQUA + "thechest.eu"
+                ChatColor.YELLOW + "Website: " + ChatColor.AQUA + "https://wrathofdungeons.net"
         };
 
         ArrayList<ServerPing.PlayerInfo> a = new ArrayList<ServerPing.PlayerInfo>();
