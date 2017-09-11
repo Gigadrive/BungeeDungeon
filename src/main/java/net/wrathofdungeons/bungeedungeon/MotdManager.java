@@ -40,6 +40,10 @@ public class MotdManager {
         return s;
     }
 
+    public String getMaintenanceMotd(){
+        return ChatColor.RED.toString() + "Currently in maintenance!";
+    }
+
     public void loadFromDatabase(){
         BungeeDungeon.async(() -> {
             try {

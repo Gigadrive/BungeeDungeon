@@ -8,19 +8,20 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import net.wrathofdungeons.bungeedungeon.listener.LoginListener;
 import net.wrathofdungeons.bungeedungeon.listener.PingListener;
 import net.wrathofdungeons.bungeedungeon.tasks.ReloadCachesTask;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Random;
+import java.util.*;
 
 public class BungeeDungeon extends Plugin {
     private static BungeeDungeon instance;
     private Configuration config;
     private static MotdManager motdManager;
+
+    public static boolean WHITELIST_ENABLED = true;
+    public static ArrayList<UUID> WHITELIST = new ArrayList<UUID>();
 
     public void onEnable(){
         instance = this;
@@ -42,11 +43,20 @@ public class BungeeDungeon extends Plugin {
     }
 
     private void registerListeners(){
+        getProxy().getPluginManager().registerListener(this, new LoginListener());
         getProxy().getPluginManager().registerListener(this, new PingListener());
     }
 
     private void registerCommands(){
 
+    }
+
+    public static boolean isWhitelisted(UUID uuid){
+        for(UUID u : WHITELIST){
+            if(u.toString().equals(uuid.toString())) return true;
+        }
+
+        return false;
     }
 
     public void onDisable(){
