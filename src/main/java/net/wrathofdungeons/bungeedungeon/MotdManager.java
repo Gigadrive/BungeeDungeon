@@ -47,8 +47,11 @@ public class MotdManager {
                 ResultSet rs = ps.executeQuery();
 
                 if(rs.first()){
-                    this.firstLine = ChatColor.translateAlternateColorCodes('&',rs.getString("line1"));
-                    this.secondLine = ChatColor.translateAlternateColorCodes('&',rs.getString("line2"));
+                    String line1 = rs.getString("line1");
+                    String line2 = rs.getString("line2");
+
+                    if(line1 != null) this.firstLine = ChatColor.translateAlternateColorCodes('&',line1);
+                    if(line2 != null) this.secondLine = ChatColor.translateAlternateColorCodes('&',line2);
                 }
 
                 MySQLManager.getInstance().closeResources(rs,ps);
