@@ -8,8 +8,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
-import net.wrathofdungeons.bungeedungeon.listener.LoginListener;
-import net.wrathofdungeons.bungeedungeon.listener.PingListener;
+import net.wrathofdungeons.bungeedungeon.listener.*;
 import net.wrathofdungeons.bungeedungeon.tasks.ReloadCachesTask;
 
 import java.io.*;
@@ -22,6 +21,8 @@ public class BungeeDungeon extends Plugin {
 
     public static boolean WHITELIST_ENABLED = true;
     public static ArrayList<UUID> WHITELIST = new ArrayList<UUID>();
+
+    public static ArrayList<String> ON_SERVER = new ArrayList<String>();
 
     public void onEnable(){
         instance = this;
@@ -43,8 +44,11 @@ public class BungeeDungeon extends Plugin {
     }
 
     private void registerListeners(){
+        getProxy().getPluginManager().registerListener(this, new ConnectListener());
         getProxy().getPluginManager().registerListener(this, new LoginListener());
         getProxy().getPluginManager().registerListener(this, new PingListener());
+        getProxy().getPluginManager().registerListener(this, new PluginMessageListener());
+        getProxy().getPluginManager().registerListener(this, new QuitListener());
     }
 
     private void registerCommands(){

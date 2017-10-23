@@ -5,6 +5,7 @@ import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
+import net.wrathofdungeons.bungeedungeon.users.BungeeUser;
 
 import java.util.UUID;
 
@@ -18,7 +19,12 @@ public class LoginListener implements Listener {
                 if(!BungeeDungeon.isWhitelisted(uuid)){
                     e.setCancelReason(ChatColor.RED + "You are not whitelisted.");
                     e.setCancelled(true);
+                    return;
                 }
+            }
+
+            if(!e.isCancelled()){
+                BungeeUser.load(uuid);
             }
         } else {
             e.setCancelReason(ChatColor.RED + "No UUID submitted.");
