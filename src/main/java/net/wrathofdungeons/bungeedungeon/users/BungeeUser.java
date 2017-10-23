@@ -2,6 +2,7 @@ package net.wrathofdungeons.bungeedungeon.users;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
+import net.wrathofdungeons.bungeedungeon.Util;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -101,7 +102,7 @@ public class BungeeUser {
         if(!joined && getProxiedPlayer() != null){
             joined = true;
 
-            // TODO: Add join messages etc.
+            p.setDisplayName(Util.limitString(getRank().getColor() + p.getName(),16));
         }
     }
 
