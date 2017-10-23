@@ -1,8 +1,10 @@
 package net.wrathofdungeons.bungeedungeon.tasks;
 
+import net.md_5.bungee.api.ChatColor;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
 import net.wrathofdungeons.bungeedungeon.MotdManager;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
+import net.wrathofdungeons.bungeedungeon.users.Rank;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,6 +38,8 @@ public class ReloadCachesTask implements Runnable {
             } catch(Exception e){
                 e.printStackTrace();
             }
+
+            BungeeDungeon.createStaffMessage(ChatColor.GRAY + "[Staff] " + ChatColor.GOLD + "The cache has been reloaded.", Rank.ADMIN);
         });
 
         BungeeDungeon.getInstance().getProxy().getScheduler().schedule(BungeeDungeon.getInstance(),this,delayInMinutes, TimeUnit.MINUTES);

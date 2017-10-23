@@ -2,6 +2,7 @@ package net.wrathofdungeons.bungeedungeon;
 
 import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -10,6 +11,8 @@ import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 import net.wrathofdungeons.bungeedungeon.listener.*;
 import net.wrathofdungeons.bungeedungeon.tasks.ReloadCachesTask;
+import net.wrathofdungeons.bungeedungeon.users.BungeeUser;
+import net.wrathofdungeons.bungeedungeon.users.Rank;
 
 import java.io.*;
 import java.util.*;
@@ -73,6 +76,24 @@ public class BungeeDungeon extends Plugin {
 
     public static BungeeDungeon getInstance() {
         return instance;
+    }
+
+    public static void createStaffMessage(String msg, Rank rank){
+        createStaffMessage(rank,msg);
+    }
+
+    public static void createStaffMessage(Rank rank, String msg){
+        for(ProxiedPlayer p : BungeeDungeon.getInstance().getProxy().getPlayers()){
+            if(BungeeUser.isLoaded(p)){
+                BungeeUser u = BungeeUser.get(p);
+
+                if(u.hasPermission(rank)){
+                    p.sendMessage(TextComponent.fromLegacyText(msg));
+                }
+            }
+        }
+
+        BungeeDungeon.getInstance().getProxy().getConsole().sendMessage(TextComponent.fromLegacyText(msg));
     }
 
     public static void async(Runnable runnable){
