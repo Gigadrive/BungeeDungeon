@@ -9,6 +9,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import net.wrathofdungeons.bungeedungeon.cmd.StaffChatCommand;
 import net.wrathofdungeons.bungeedungeon.listener.*;
 import net.wrathofdungeons.bungeedungeon.tasks.ReloadCachesTask;
 import net.wrathofdungeons.bungeedungeon.users.BungeeUser;
@@ -55,7 +56,7 @@ public class BungeeDungeon extends Plugin {
     }
 
     private void registerCommands(){
-
+        getProxy().getPluginManager().registerCommand(this,new StaffChatCommand());
     }
 
     public static boolean isWhitelisted(UUID uuid){
