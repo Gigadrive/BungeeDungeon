@@ -1,11 +1,13 @@
 package net.wrathofdungeons.bungeedungeon.users;
 
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
 import net.wrathofdungeons.bungeedungeon.Util;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -43,6 +45,7 @@ public class BungeeUser {
     private UUID uuid;
     private ProxiedPlayer p;
     private Rank rank;
+    private ArrayList<String> friends;
 
     private boolean joined = false;
 
@@ -57,7 +60,7 @@ public class BungeeUser {
             if(rs.first()){
                 this.rank = Rank.valueOf(rs.getString("rank"));
 
-                STORAGE.put(uuid.toString(),this);
+
             } else {
                 PreparedStatement insert = MySQLManager.getInstance().getConnection().prepareStatement("INSERT INTO `users` (`uuid`) VALUES(?);");
                 insert.setString(1,uuid.toString());
@@ -71,6 +74,46 @@ public class BungeeUser {
         } catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void reloadFriends(){
+        if(friends == null){
+            friends = new ArrayList<String>();
+        } else {
+            friends.clear();
+        }
+
+        try {
+            PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("SELECT * FROM `friendships` WHERE `player1` = ? OR `player2` = ?");
+            ps.setString(1,uuid.toString());
+            ps.setString(2,uuid.toString());
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                String player1 = rs.getString("player1");
+                String player2 = rs.getString("player2");
+
+                if(player1.equals(uuid.toString())){
+                    friends.add(player2);
+                } else {
+                    friends.add(player1);
+                }
+            }
+
+            MySQLManager.getInstance().closeResources(rs,ps);
+
+            if(!STORAGE.containsKey(uuid.toString())){
+                STORAGE.put(uuid.toString(),this);
+            } else {
+                reloadSpigotFriends();
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void reloadSpigotFriends(){
+        if(p != null && p.getServer() != null) BungeeDungeon.sendToBukkit(p.getServer(),"reloadFriends",p.getName());
     }
 
     public void setProxiedPlayer(ProxiedPlayer p){

@@ -5,6 +5,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
@@ -45,6 +46,8 @@ public class BungeeDungeon extends Plugin {
         registerCommands();
 
         ReloadCachesTask._do();
+
+        ProxyServer.getInstance().registerChannel("BungeeCord");
     }
 
     private void registerListeners(){
@@ -111,6 +114,25 @@ public class BungeeDungeon extends Plugin {
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(getConfig(), new File(getDataFolder() + "config.yml"));
         } catch(Exception e){
             e.printStackTrace();
+        }
+    }
+
+    public static void sendToBukkit(Server server, String ... data) {
+        sendToBukkit(server.getInfo(),data);
+    }
+
+    public static void sendToBukkit(ServerInfo server, String ... data) {
+        if(data != null) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            DataOutputStream out = new DataOutputStream(stream);
+            try {
+                for(String s : data) {
+                    out.writeUTF(s);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            server.sendData("BungeeCord", stream.toByteArray());
         }
     }
 
