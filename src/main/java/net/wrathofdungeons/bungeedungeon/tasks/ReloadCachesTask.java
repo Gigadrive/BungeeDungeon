@@ -1,9 +1,11 @@
 package net.wrathofdungeons.bungeedungeon.tasks;
 
+import javafx.print.PageLayout;
 import net.md_5.bungee.api.ChatColor;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
 import net.wrathofdungeons.bungeedungeon.MotdManager;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
+import net.wrathofdungeons.bungeedungeon.users.PlayerUtilities;
 import net.wrathofdungeons.bungeedungeon.users.Rank;
 
 import java.sql.PreparedStatement;
@@ -22,6 +24,11 @@ public class ReloadCachesTask implements Runnable {
     public void run() {
         BungeeDungeon.async(() -> {
             BungeeDungeon.getMotdManager().loadFromDatabase();
+
+            PlayerUtilities.IP_COUNTRY_CACHE.clear();
+            PlayerUtilities.NAME_UUID_CACHE.clear();
+            PlayerUtilities.UUID_NAME_CACHE.clear();
+            PlayerUtilities.UUID_SETTINGS_CACHE.clear();
 
             BungeeDungeon.WHITELIST.clear();
 

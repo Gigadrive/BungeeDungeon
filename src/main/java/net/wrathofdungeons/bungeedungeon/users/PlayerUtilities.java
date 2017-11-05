@@ -3,6 +3,7 @@ package net.wrathofdungeons.bungeedungeon.users;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
 
 import java.io.BufferedReader;
@@ -12,8 +13,13 @@ import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class PlayerUtilities {
+    public static HashMap<UUID,Rank> UUID_RANK_CACHE = new HashMap<UUID,Rank>();
+    public static HashMap<String,UUID> NAME_UUID_CACHE = new HashMap<String,UUID>();
+    public static HashMap<UUID,String> UUID_NAME_CACHE = new HashMap<UUID,String>();
+    public static HashMap<UUID,HashMap<String,Boolean>> UUID_SETTINGS_CACHE = new HashMap<UUID,HashMap<String,Boolean>>();
     public static HashMap<String, String> IP_COUNTRY_CACHE = new HashMap<String, String>();
 
     public static String getCountryCodeFromIP(String ip){
@@ -69,6 +75,113 @@ public class PlayerUtilities {
         } catch(Exception e){
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static Rank getRankFromUUID(String uuid){
+        return getRankFromUUID(UUID.fromString(uuid));
+    }
+
+    public static Rank getRankFromUUID(UUID uuid){
+        if(uuid == null) return Rank.USER;
+
+        if(BungeeDungeon.getInstance().getProxy().getPlayer(uuid) != null) return BungeeUser.get(BungeeDungeon.getInstance().getProxy().getPlayer(uuid)).getRank();
+
+        if(UUID_RANK_CACHE.containsKey(uuid)){
+            return UUID_RANK_CACHE.get(uuid);
+        } else {
+            Rank r = Rank.USER;
+
+            try {
+                PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("SELECT * FROM `users` WHERE `uuid` = ?");
+                ps.setString(1,uuid.toString());
+
+                ResultSet rs = ps.executeQuery();
+                if(rs.first()){
+                    r = Rank.valueOf(rs.getString("rank"));
+                    UUID_RANK_CACHE.put(uuid,r);
+                }
+
+                MySQLManager.getInstance().closeResources(rs,ps);
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+
+            return r;
+        }
+    }
+
+    public static UUID getUUIDFromName(String name){
+        if(name == null || name.isEmpty()) return null;
+
+        if(BungeeDungeon.getInstance().getProxy().getPlayer(name) != null) return BungeeDungeon.getInstance().getProxy().getPlayer(name).getUniqueId();
+
+        if(NAME_UUID_CACHE.containsKey(name)){
+            return NAME_UUID_CACHE.get(name);
+        } else {
+            UUID uuid = null;
+
+            try {
+                PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("SELECT * FROM `users` WHERE `username` = ?");
+                ps.setString(1,name);
+
+                ResultSet rs = ps.executeQuery();
+                if(rs.first()){
+                    name = rs.getString("username");
+                    String u = rs.getString("uuid");
+                    uuid = UUID.fromString(u);
+
+                    NAME_UUID_CACHE.put(name,uuid);
+                }
+
+                MySQLManager.getInstance().closeResources(rs,ps);
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+
+            if(uuid == null){
+                String u = UUIDFetcher.getUUID(name);
+
+                if(u != null && !u.isEmpty()){
+                    uuid = UUID.fromString(u);
+                }
+            }
+
+            return uuid;
+        }
+    }
+
+    public static String getNameFromUUID(String uuid){
+        return getNameFromUUID(UUID.fromString(uuid));
+    }
+
+    public static String getNameFromUUID(UUID uuid){
+        if(uuid == null) return null;
+
+        if(BungeeDungeon.getInstance().getProxy().getPlayer(uuid) != null) return BungeeDungeon.getInstance().getProxy().getPlayer(uuid).getName();
+
+        if(UUID_NAME_CACHE.containsKey(uuid)){
+            return UUID_NAME_CACHE.get(uuid);
+        } else {
+            String name = null;
+
+            try {
+                PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("SELECT * FROM `users` WHERE `uuid` = ?");
+                ps.setString(1,uuid.toString());
+
+                ResultSet rs = ps.executeQuery();
+                if(rs.first()){
+                    name = rs.getString("username");
+
+                    UUID_NAME_CACHE.put(uuid,name);
+                }
+
+                MySQLManager.getInstance().closeResources(rs,ps);
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+
+            return name;
         }
     }
 }

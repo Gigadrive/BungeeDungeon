@@ -60,7 +60,7 @@ public class BungeeUser {
             if(rs.first()){
                 this.rank = Rank.valueOf(rs.getString("rank"));
 
-
+                reloadFriends();
             } else {
                 PreparedStatement insert = MySQLManager.getInstance().getConnection().prepareStatement("INSERT INTO `users` (`uuid`) VALUES(?);");
                 insert.setString(1,uuid.toString());
@@ -139,6 +139,10 @@ public class BungeeUser {
 
     public UUID getUUID() {
         return uuid;
+    }
+
+    public ArrayList<String> getFriends() {
+        return friends;
     }
 
     public void callJoin(){
