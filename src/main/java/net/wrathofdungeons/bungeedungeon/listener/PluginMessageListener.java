@@ -29,6 +29,8 @@ public class PluginMessageListener implements Listener {
                 String executor = dis.readUTF();
                 String command = dis.readUTF();
 
+                //System.out.println("Incoming global command request for " + executor + ": \"" + command + "\"");
+
                 if(executor.equalsIgnoreCase("CONSOLE") || executor.equalsIgnoreCase("BungeeConsole") || BungeeDungeon.getInstance().getProxy().getPlayer(executor) == null){
                     BungeeDungeon.getInstance().getProxy().getPluginManager().dispatchCommand(BungeeDungeon.getInstance().getProxy().getConsole(), command);
                 } else {
