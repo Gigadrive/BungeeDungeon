@@ -76,6 +76,15 @@ public class GuildActionCommand extends Command {
                                         servers.add(server.getName());
                                     }
                                 }
+
+                                for(ServerInfo info : CloudAPI.getInstance().getServers("Test")){
+                                    net.md_5.bungee.api.config.ServerInfo server = BungeeDungeon.getInstance().getProxy().getServerInfo(info.getServiceId().getServerId());
+
+                                    if(server != null) if(server.getName() != null && !servers.contains(server.getName())){
+                                        BungeeDungeon.sendToBukkit(server,data.toArray(new String[]{}));
+                                        servers.add(server.getName());
+                                    }
+                                }
                             }
                         }
                     }
