@@ -16,11 +16,7 @@ public class PermissionListener implements Listener {
             if(BungeeUser.isLoaded(p)){
                 BungeeUser u = BungeeUser.get(p);
 
-                if(e.getPermission().equalsIgnoreCase("bungeecord.command.end")){
-                    e.setHasPermission(u.hasPermission(Rank.ADMIN));
-                } else {
-                    if(u.hasPermission(Rank.GM)) e.setHasPermission(true);
-                }
+                if(u.hasPermission(Rank.ADMIN)) e.setHasPermission(true);
             }
         }
     }
