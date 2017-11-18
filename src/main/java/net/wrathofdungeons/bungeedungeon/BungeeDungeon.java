@@ -55,6 +55,7 @@ public class BungeeDungeon extends Plugin {
     private void registerListeners(){
         getProxy().getPluginManager().registerListener(this, new ConnectListener());
         getProxy().getPluginManager().registerListener(this, new LoginListener());
+        getProxy().getPluginManager().registerListener(this, new PermissionListener());
         getProxy().getPluginManager().registerListener(this, new PingListener());
         getProxy().getPluginManager().registerListener(this, new PluginMessageListener());
         getProxy().getPluginManager().registerListener(this, new QuitListener());
