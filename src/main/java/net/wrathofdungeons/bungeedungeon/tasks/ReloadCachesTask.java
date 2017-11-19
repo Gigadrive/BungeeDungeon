@@ -29,6 +29,7 @@ public class ReloadCachesTask implements Runnable {
             PlayerUtilities.NAME_UUID_CACHE.clear();
             PlayerUtilities.UUID_NAME_CACHE.clear();
             PlayerUtilities.UUID_SETTINGS_CACHE.clear();
+            PlayerUtilities.UUID_FRIENDREQUESTS_CACHE.clear();
 
             BungeeDungeon.WHITELIST.clear();
 
