@@ -1,5 +1,8 @@
 package net.wrathofdungeons.bungeedungeon.users;
 
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
@@ -46,6 +49,7 @@ public class BungeeUser {
     private ProxiedPlayer p;
     private Rank rank;
     private ArrayList<String> friends;
+    private ArrayList<String> friendRequests;
 
     private boolean joined = false;
 
@@ -61,6 +65,7 @@ public class BungeeUser {
                 this.rank = Rank.valueOf(rs.getString("rank"));
 
                 reloadFriends();
+                reloadFriendRequests();
             } else {
                 PreparedStatement insert = MySQLManager.getInstance().getConnection().prepareStatement("INSERT INTO `users` (`uuid`) VALUES(?);");
                 insert.setString(1,uuid.toString());
@@ -102,11 +107,31 @@ public class BungeeUser {
 
             MySQLManager.getInstance().closeResources(rs,ps);
 
-            if(!STORAGE.containsKey(uuid.toString())){
-                STORAGE.put(uuid.toString(),this);
-            } else {
-                reloadSpigotFriends();
+            if(STORAGE.containsKey(uuid.toString())) reloadSpigotFriends();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void reloadFriendRequests(){
+        if(friendRequests == null){
+            friendRequests = new ArrayList<String>();
+        } else {
+            friendRequests.clear();
+        }
+
+        try {
+            PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("SELECT * FROM `friend_requests` WHERE `to` = ?");
+            ps.setString(1,uuid.toString());
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                friendRequests.add(rs.getString("from"));
             }
+
+            MySQLManager.getInstance().closeResources(rs,ps);
+
+            if(!STORAGE.containsKey(uuid.toString())) STORAGE.put(uuid.toString(),this);
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -145,11 +170,31 @@ public class BungeeUser {
         return friends;
     }
 
+    public ArrayList<String> getFriendRequests() {
+        return friendRequests;
+    }
+
+    public void clearCaches(){
+        PlayerUtilities.UUID_RANK_CACHE.remove(p.getUniqueId());
+        PlayerUtilities.NAME_UUID_CACHE.remove(p.getName());
+        PlayerUtilities.UUID_NAME_CACHE.remove(p.getUniqueId());
+        PlayerUtilities.UUID_FRIENDREQUESTS_CACHE.remove(p.getUniqueId());
+        PlayerUtilities.UUID_SETTINGS_CACHE.remove(p.getUniqueId());
+    }
+
     public void callJoin(){
         if(!joined && getProxiedPlayer() != null){
             joined = true;
 
+            clearCaches();
+
             p.setDisplayName(Util.limitString(getRank().getColor() + p.getName(),16));
+
+            if(getFriendRequests().size() == 1){
+                p.sendMessage(new ComponentBuilder(ChatColor.AQUA + "You have " + ChatColor.YELLOW + getFriendRequests().size() + ChatColor.AQUA + " open friend request. Click here to review it.").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend requests")).create());
+            } else if(getFriendRequests().size() > 1){
+                p.sendMessage(new ComponentBuilder(ChatColor.AQUA + "You have " + ChatColor.YELLOW + getFriendRequests().size() + ChatColor.AQUA + " open friend requests. Click here to review them.").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend requests")).create());
+            }
         }
     }
 

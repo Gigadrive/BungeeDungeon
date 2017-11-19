@@ -10,6 +10,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import net.wrathofdungeons.bungeedungeon.cmd.FriendCommand;
 import net.wrathofdungeons.bungeedungeon.cmd.GuildActionCommand;
 import net.wrathofdungeons.bungeedungeon.cmd.ServerCommand;
 import net.wrathofdungeons.bungeedungeon.cmd.StaffChatCommand;
@@ -62,6 +63,7 @@ public class BungeeDungeon extends Plugin {
     }
 
     private void registerCommands(){
+        getProxy().getPluginManager().registerCommand(this,new FriendCommand());
         getProxy().getPluginManager().registerCommand(this,new GuildActionCommand());
         getProxy().getPluginManager().registerCommand(this,new ServerCommand());
         getProxy().getPluginManager().registerCommand(this,new StaffChatCommand());

@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ public class PlayerUtilities {
     public static HashMap<UUID,Rank> UUID_RANK_CACHE = new HashMap<UUID,Rank>();
     public static HashMap<String,UUID> NAME_UUID_CACHE = new HashMap<String,UUID>();
     public static HashMap<UUID,String> UUID_NAME_CACHE = new HashMap<UUID,String>();
+    public static HashMap<UUID,ArrayList<String>> UUID_FRIENDREQUESTS_CACHE = new HashMap<UUID,ArrayList<String>>();
     public static HashMap<UUID,HashMap<String,Boolean>> UUID_SETTINGS_CACHE = new HashMap<UUID,HashMap<String,Boolean>>();
     public static HashMap<String, String> IP_COUNTRY_CACHE = new HashMap<String, String>();
 
@@ -182,6 +184,36 @@ public class PlayerUtilities {
             }
 
             return name;
+        }
+    }
+
+    public static ArrayList<String> getFriendRequestsToUUID(UUID uuid){
+        if(uuid == null) return null;
+
+        if(BungeeDungeon.getInstance().getProxy().getPlayer(uuid) != null && BungeeUser.isLoaded(uuid)) return BungeeUser.get(uuid).getFriendRequests();
+
+        if(UUID_FRIENDREQUESTS_CACHE.containsKey(uuid)){
+            return UUID_FRIENDREQUESTS_CACHE.get(uuid);
+        } else {
+            ArrayList<String> friendRequests = new ArrayList<String>();
+
+            try {
+                PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("SELECT * FROM `friend_requests` WHERE `to` = ?");
+                ps.setString(1,uuid.toString());
+
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    friendRequests.add(rs.getString("from"));
+                }
+
+                MySQLManager.getInstance().closeResources(rs,ps);
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+
+            UUID_FRIENDREQUESTS_CACHE.put(uuid,friendRequests);
+
+            return friendRequests;
         }
     }
 }
