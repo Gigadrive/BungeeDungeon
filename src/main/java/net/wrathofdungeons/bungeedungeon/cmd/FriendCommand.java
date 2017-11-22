@@ -97,7 +97,7 @@ public class FriendCommand extends Command {
                                         ArrayList<String> friendRequests = PlayerUtilities.getFriendRequestsToUUID(uuid);
 
                                         if(friendRequests != null){
-                                            if(!friendRequests.contains(uuid.toString())){
+                                            if(!friendRequests.contains(p.getUniqueId().toString())){
                                                 try {
                                                     PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("INSERT INTO `friend_requests` (`from`,`to`) VALUES(?,?);");
                                                     ps.setString(1,p.getUniqueId().toString());
