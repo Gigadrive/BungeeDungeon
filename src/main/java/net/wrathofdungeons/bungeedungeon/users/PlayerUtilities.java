@@ -21,7 +21,8 @@ public class PlayerUtilities {
     public static HashMap<String,UUID> NAME_UUID_CACHE = new HashMap<String,UUID>();
     public static HashMap<UUID,String> UUID_NAME_CACHE = new HashMap<UUID,String>();
     public static HashMap<UUID,ArrayList<String>> UUID_FRIENDREQUESTS_CACHE = new HashMap<UUID,ArrayList<String>>();
-    public static HashMap<UUID,HashMap<String,Boolean>> UUID_SETTINGS_CACHE = new HashMap<UUID,HashMap<String,Boolean>>();
+    public static HashMap<UUID,ArrayList<String>> UUID_OUTGOINGFRIENDREQUESTS_CACHE = new HashMap<UUID,ArrayList<String>>();
+    public static HashMap<UUID,UserSettingsManager> UUID_SETTINGS_CACHE = new HashMap<UUID,UserSettingsManager>();
     public static HashMap<String, String> IP_COUNTRY_CACHE = new HashMap<String, String>();
 
     public static String getCountryCodeFromIP(String ip){
@@ -110,6 +111,35 @@ public class PlayerUtilities {
             }
 
             return r;
+        }
+    }
+
+    public static UserSettingsManager getSettingsFromUUID(UUID uuid){
+        if(uuid == null) return new UserSettingsManager();
+
+        if(BungeeDungeon.getInstance().getProxy().getPlayer(uuid) != null) return BungeeUser.get(BungeeDungeon.getInstance().getProxy().getPlayer(uuid)).getSettings();
+
+        if(UUID_SETTINGS_CACHE.containsKey(uuid)){
+            return UUID_SETTINGS_CACHE.get(uuid);
+        } else {
+            UserSettingsManager s = new UserSettingsManager();
+
+            try {
+                PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("SELECT * FROM `users` WHERE `uuid` = ?");
+                ps.setString(1,uuid.toString());
+
+                ResultSet rs = ps.executeQuery();
+                if(rs.first()){
+                    s = BungeeDungeon.GSON.fromJson(rs.getString("settings"),UserSettingsManager.class);
+                    UUID_SETTINGS_CACHE.put(uuid,s);
+                }
+
+                MySQLManager.getInstance().closeResources(rs,ps);
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+
+            return s;
         }
     }
 
@@ -212,6 +242,34 @@ public class PlayerUtilities {
             }
 
             UUID_FRIENDREQUESTS_CACHE.put(uuid,friendRequests);
+
+            return friendRequests;
+        }
+    }
+
+    public static ArrayList<String> getFriendRequestsFromUUID(UUID uuid){
+        if(uuid == null) return null;
+
+        if(UUID_OUTGOINGFRIENDREQUESTS_CACHE.containsKey(uuid)){
+            return UUID_OUTGOINGFRIENDREQUESTS_CACHE.get(uuid);
+        } else {
+            ArrayList<String> friendRequests = new ArrayList<String>();
+
+            try {
+                PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("SELECT * FROM `friend_requests` WHERE `from` = ?");
+                ps.setString(1,uuid.toString());
+
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    friendRequests.add(rs.getString("to"));
+                }
+
+                MySQLManager.getInstance().closeResources(rs,ps);
+            } catch(Exception e){
+                e.printStackTrace();
+            }
+
+            UUID_OUTGOINGFRIENDREQUESTS_CACHE.put(uuid,friendRequests);
 
             return friendRequests;
         }

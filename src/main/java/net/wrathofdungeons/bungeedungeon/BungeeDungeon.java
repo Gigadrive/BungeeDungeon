@@ -1,6 +1,7 @@
 package net.wrathofdungeons.bungeedungeon;
 
 import com.google.common.io.ByteStreams;
+import com.google.gson.Gson;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -10,10 +11,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
-import net.wrathofdungeons.bungeedungeon.cmd.FriendCommand;
-import net.wrathofdungeons.bungeedungeon.cmd.GuildActionCommand;
-import net.wrathofdungeons.bungeedungeon.cmd.ServerCommand;
-import net.wrathofdungeons.bungeedungeon.cmd.StaffChatCommand;
+import net.wrathofdungeons.bungeedungeon.cmd.*;
 import net.wrathofdungeons.bungeedungeon.listener.*;
 import net.wrathofdungeons.bungeedungeon.tasks.ReloadCachesTask;
 import net.wrathofdungeons.bungeedungeon.users.BungeeUser;
@@ -31,6 +29,8 @@ public class BungeeDungeon extends Plugin {
     public static ArrayList<UUID> WHITELIST = new ArrayList<UUID>();
 
     public static ArrayList<String> ON_SERVER = new ArrayList<String>();
+
+    public static final Gson GSON = new Gson();
 
     public void onEnable(){
         instance = this;
@@ -65,6 +65,9 @@ public class BungeeDungeon extends Plugin {
     private void registerCommands(){
         getProxy().getPluginManager().registerCommand(this,new FriendCommand());
         getProxy().getPluginManager().registerCommand(this,new GuildActionCommand());
+        getProxy().getPluginManager().registerCommand(this,new MessageCommand());
+        getProxy().getPluginManager().registerCommand(this,new ReloadSettingsCommand());
+        getProxy().getPluginManager().registerCommand(this,new ReplyCommand());
         getProxy().getPluginManager().registerCommand(this,new ServerCommand());
         getProxy().getPluginManager().registerCommand(this,new StaffChatCommand());
     }

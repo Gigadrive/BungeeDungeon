@@ -38,7 +38,7 @@ public class BungeeUser {
     }
 
     public static boolean isLoaded(ProxiedPlayer p){
-        return isLoaded(p.getUniqueId());
+        return p != null && isLoaded(p.getUniqueId());
     }
 
     public static BungeeUser get(ProxiedPlayer p){
@@ -52,6 +52,9 @@ public class BungeeUser {
     private ArrayList<String> friendRequests;
 
     private boolean joined = false;
+    private UserSettingsManager settingsManager;
+
+    public ProxiedPlayer lastMsg;
 
     public BungeeUser(UUID uuid){
         this.uuid = uuid;
@@ -131,7 +134,25 @@ public class BungeeUser {
 
             MySQLManager.getInstance().closeResources(rs,ps);
 
-            if(!STORAGE.containsKey(uuid.toString())) STORAGE.put(uuid.toString(),this);
+            if(!STORAGE.containsKey(uuid.toString())){
+                STORAGE.put(uuid.toString(),this);
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void reloadSettings(){
+        try {
+            PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("SELECT * FROM `users` WHERE `uuid` = ?");
+            ps.setString(1,uuid.toString());
+
+            ResultSet rs = ps.executeQuery();
+            if(rs.first()){
+                settingsManager = BungeeDungeon.GSON.fromJson(rs.getString("settings"),UserSettingsManager.class);
+            }
+
+            MySQLManager.getInstance().closeResources(rs,ps);
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -144,6 +165,10 @@ public class BungeeUser {
     public void setProxiedPlayer(ProxiedPlayer p){
         this.p = p;
         saveData();
+    }
+
+    public UserSettingsManager getSettings() {
+        return settingsManager;
     }
 
     public ProxiedPlayer getProxiedPlayer() {

@@ -98,29 +98,33 @@ public class FriendCommand extends Command {
 
                                         if(friendRequests != null){
                                             if(!friendRequests.contains(p.getUniqueId().toString())){
-                                                try {
-                                                    PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("INSERT INTO `friend_requests` (`from`,`to`) VALUES(?,?);");
-                                                    ps.setString(1,p.getUniqueId().toString());
-                                                    ps.setString(2,uuid.toString());
-                                                    ps.executeUpdate();
-                                                    ps.close();
+                                                if(u.hasPermission(Rank.MODERATOR) || PlayerUtilities.getSettingsFromUUID(uuid).allowsFriendRequests()){
+                                                    try {
+                                                        PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("INSERT INTO `friend_requests` (`from`,`to`) VALUES(?,?);");
+                                                        ps.setString(1,p.getUniqueId().toString());
+                                                        ps.setString(2,uuid.toString());
+                                                        ps.executeUpdate();
+                                                        ps.close();
 
-                                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "You have sucessfully sent a friend request to " + ChatColor.YELLOW + name + ChatColor.AQUA + "."));
+                                                        p.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "You have sucessfully sent a friend request to " + ChatColor.YELLOW + name + ChatColor.AQUA + "."));
 
-                                                    if(BungeeUser.isLoaded(uuid)){
-                                                        BungeeUser u2 = BungeeUser.get(uuid);
-                                                        ProxiedPlayer p2 = u2.getProxiedPlayer();
+                                                        if(BungeeUser.isLoaded(uuid)){
+                                                            BungeeUser u2 = BungeeUser.get(uuid);
+                                                            ProxiedPlayer p2 = u2.getProxiedPlayer();
 
-                                                        u2.reloadFriendRequests();
+                                                            u2.reloadFriendRequests();
 
-                                                        if(p2 != null){
-                                                            p2.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "You received a friend request from " + ChatColor.YELLOW + p.getName() + ChatColor.AQUA + "!"));
-                                                            p2.sendMessage(new ComponentBuilder("Click here: ").color(ChatColor.AQUA).append("[ACCEPT]").color(net.md_5.bungee.api.ChatColor.GREEN).bold(true).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend accept " + p.getName())).append(" ").append("[DENY]").color(ChatColor.RED).bold(true).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend deny " + p.getName())).create());
+                                                            if(p2 != null){
+                                                                p2.sendMessage(TextComponent.fromLegacyText(ChatColor.AQUA + "You received a friend request from " + ChatColor.YELLOW + p.getName() + ChatColor.AQUA + "!"));
+                                                                p2.sendMessage(new ComponentBuilder("Click here: ").color(ChatColor.AQUA).append("[ACCEPT]").color(net.md_5.bungee.api.ChatColor.GREEN).bold(true).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend accept " + p.getName())).append(" ").append("[DENY]").color(ChatColor.RED).bold(true).event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend deny " + p.getName())).create());
+                                                            }
                                                         }
+                                                    } catch(Exception e){
+                                                        p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An error occurred."));
+                                                        e.printStackTrace();
                                                     }
-                                                } catch(Exception e){
-                                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An error occurred."));
-                                                    e.printStackTrace();
+                                                } else {
+                                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "That player does not allow friend requests."));
                                                 }
                                             } else {
                                                 p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "You have already sent a request to that player."));
