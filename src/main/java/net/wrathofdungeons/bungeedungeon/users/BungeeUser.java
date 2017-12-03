@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
+import net.wrathofdungeons.bungeedungeon.DefaultFontInfo;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
 import net.wrathofdungeons.bungeedungeon.Util;
 
@@ -66,6 +67,7 @@ public class BungeeUser {
             ResultSet rs = ps.executeQuery();
             if(rs.first()){
                 this.rank = Rank.valueOf(rs.getString("rank"));
+                this.settingsManager = BungeeDungeon.GSON.fromJson(rs.getString("settings"),UserSettingsManager.class);
 
                 reloadFriends();
                 reloadFriendRequests();
@@ -140,6 +142,62 @@ public class BungeeUser {
         } catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void sendCenteredMessage(String message){
+        sendCenteredMessage(message,true);
+    }
+
+    public String sendCenteredMessage(String message, boolean send){
+        ProxiedPlayer player = p;
+        int CENTER_PX = 154;
+        int MAX_PX = 250;
+
+        message = ChatColor.translateAlternateColorCodes('&', message);
+        int messagePxSize = 0;
+        boolean previousCode = false;
+        boolean isBold = false;
+        int charIndex = 0;
+        int lastSpaceIndex = 0;
+        String toSendAfter = null;
+        String recentColorCode = "";
+        for(char c : message.toCharArray()){
+            if(c == '§'){
+                previousCode = true;
+                continue;
+            }else if(previousCode == true){
+                previousCode = false;
+                recentColorCode = "ยง" + c;
+                if(c == 'l' || c == 'L'){
+                    isBold = true;
+                    continue;
+                }else isBold = false;
+            }else if(c == ' ') lastSpaceIndex = charIndex;
+            else{
+                DefaultFontInfo dFI = DefaultFontInfo.getDefaultFontInfo(c);
+                messagePxSize += isBold ? dFI.getBoldLength() : dFI.getLength();
+                messagePxSize++;
+            }
+            if(messagePxSize >= MAX_PX){
+                toSendAfter = recentColorCode + message.substring(lastSpaceIndex + 1, message.length());
+                message = message.substring(0, lastSpaceIndex + 1);
+                break;
+            }
+            charIndex++;
+        }
+        int halvedMessageSize = messagePxSize / 2;
+        int toCompensate = CENTER_PX - halvedMessageSize;
+        int spaceLength = DefaultFontInfo.SPACE.getLength() + 1;
+        int compensated = 0;
+        StringBuilder sb = new StringBuilder();
+        while(compensated < toCompensate){
+            sb.append(" ");
+            compensated += spaceLength;
+        }
+        String s = sb.toString() + message;
+        if(send) player.sendMessage(s);
+        if(toSendAfter != null) sendCenteredMessage(toSendAfter);
+        return s;
     }
 
     public void reloadSettings(){

@@ -2,6 +2,7 @@ package net.wrathofdungeons.bungeedungeon.cmd;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -9,13 +10,17 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
+import net.wrathofdungeons.bungeedungeon.Util;
 import net.wrathofdungeons.bungeedungeon.users.BungeeUser;
 import net.wrathofdungeons.bungeedungeon.users.PlayerUtilities;
 import net.wrathofdungeons.bungeedungeon.users.Rank;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class FriendCommand extends Command {
     public FriendCommand(){
@@ -41,28 +46,7 @@ public class FriendCommand extends Command {
 
                 if(args.length == 1){
                     if(args[0].equalsIgnoreCase("list")){
-                        if(u.getFriends().size() > 0){
-                            BungeeDungeon.async(() -> {
-                                for(String id : u.getFriends()){
-                                    if(id == null || id.isEmpty()) continue;
-                                    UUID uuid = UUID.fromString(id);
-                                    String name = PlayerUtilities.getNameFromUUID(uuid);
-                                    Rank rank = PlayerUtilities.getRankFromUUID(uuid);
-
-                                    if(name != null && !name.isEmpty() && rank != null){
-                                        ProxiedPlayer p2 = BungeeDungeon.getInstance().getProxy().getPlayer(uuid);
-
-                                        if(p2 != null){
-                                            p.sendMessage(TextComponent.fromLegacyText(rank.getColor() + name + ChatColor.AQUA + " - " + ChatColor.GREEN + p2.getServer().getInfo().getName()));
-                                        } else {
-                                            p.sendMessage(TextComponent.fromLegacyText(rank.getColor() + name + ChatColor.AQUA + " - " + ChatColor.RED + "OFFLINE"));
-                                        }
-                                    }
-                                }
-                            });
-                        } else {
-                            p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Your friends list is empty."));
-                        }
+                        BungeeDungeon.getInstance().getProxy().getPluginManager().dispatchCommand(sender,"friend list 1");
                     } else if(args[0].equalsIgnoreCase("requests")){
                         if(u.getFriendRequests().size() > 0){
                             BungeeDungeon.async(() -> {
@@ -291,6 +275,59 @@ public class FriendCommand extends Command {
                                 p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Unknown UUID."));
                             }
                         });
+                    } else if(args[0].equalsIgnoreCase("list")){
+                        if(u.getFriends().size() > 0){
+                            if(Util.isValidInteger(args[1])){
+                                int page = Integer.parseInt(args[1]);
+
+                                BungeeDungeon.async(() -> {
+                                    ArrayList<UUID> friends = new ArrayList<UUID>();
+
+                                    for(String id : u.getFriends()){
+                                        if(id == null || id.isEmpty()) continue;
+                                        UUID uuid = UUID.fromString(id);
+
+                                        friends.add(uuid);
+                                    }
+
+                                    Collections.sort(friends, (o1, o2) -> {
+                                        return Util.convertBooleanToInteger(ProxyServer.getInstance().getPlayer(o1) != null).compareTo(Util.convertBooleanToInteger(ProxyServer.getInstance().getPlayer(o2) != null));
+                                    });
+
+                                    int sizePerPage = 36;
+                                    int total = friends.size();
+
+                                    double d = (((double)total)/((double)sizePerPage));
+                                    int maxPages = ((Double)d).intValue();
+                                    if(maxPages < d) maxPages++;
+                                    if(maxPages <= 0) maxPages = 1;
+
+                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_AQUA + Util.LINE_SEPERATOR));
+                                    u.sendCenteredMessage(ChatColor.AQUA + "Friends (" + page + "/" + maxPages + ")");
+
+                                    for(UUID uuid : friends.stream().skip((page-1) * sizePerPage).limit(sizePerPage).collect(Collectors.toCollection(ArrayList::new))){
+                                        String name = PlayerUtilities.getNameFromUUID(uuid);
+                                        Rank rank = PlayerUtilities.getRankFromUUID(uuid);
+
+                                        if(name != null && !name.isEmpty() && rank != null){
+                                            ProxiedPlayer p2 = BungeeDungeon.getInstance().getProxy().getPlayer(uuid);
+
+                                            if(p2 != null){
+                                                p.sendMessage(TextComponent.fromLegacyText("  " + rank.getColor() + name + ChatColor.AQUA + " - " + ChatColor.GREEN + p2.getServer().getInfo().getName()));
+                                            } else {
+                                                p.sendMessage(TextComponent.fromLegacyText("  " + rank.getColor() + name + ChatColor.AQUA + " - " + ChatColor.RED + "OFFLINE"));
+                                            }
+                                        }
+                                    }
+
+                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_AQUA + Util.LINE_SEPERATOR));
+                                });
+                            } else {
+                                p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Please enter a valid number for a page."));
+                            }
+                        } else {
+                            p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Your friends list is empty."));
+                        }
                     } else {
                         sendUsage(p,u);
                     }
