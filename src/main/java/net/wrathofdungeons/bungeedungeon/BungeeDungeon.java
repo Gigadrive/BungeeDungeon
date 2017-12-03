@@ -63,6 +63,7 @@ public class BungeeDungeon extends Plugin {
     }
 
     private void registerCommands(){
+        getProxy().getPluginManager().registerCommand(this,new CallGlobalLoginCommand());
         getProxy().getPluginManager().registerCommand(this,new FriendCommand());
         getProxy().getPluginManager().registerCommand(this,new GuildActionCommand());
         getProxy().getPluginManager().registerCommand(this,new MessageCommand());
