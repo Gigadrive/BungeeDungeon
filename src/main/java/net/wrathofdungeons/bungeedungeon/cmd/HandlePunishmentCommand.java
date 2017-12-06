@@ -99,7 +99,7 @@ public class HandlePunishmentCommand extends Command {
                                                             ProxiedPlayer p2 = BungeeDungeon.getInstance().getProxy().getPlayer(name);
 
                                                             if(p2 != null)
-                                                                p2.disconnect(TextComponent.fromLegacyText(ban.getDisconnectMessage()));
+                                                                p2.disconnect(TextComponent.fromLegacyText(b.getDisconnectMessage()));
                                                         } else {
                                                             p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An error occurred."));
                                                         }
