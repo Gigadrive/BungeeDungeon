@@ -79,7 +79,7 @@ public class HandlePunishmentCommand extends Command {
                                                     }
 
                                                     ps.setInt(2,banReason.getId());
-                                                    ps.setTimestamp(3,new Timestamp(cal.getTime().getTime()));
+                                                    ps.setTimestamp(3,banReason.getTypeOfPunishment() == BanReason.PunishmentType.PERMBAN ? null : new Timestamp(cal.getTime().getTime()));
                                                     ps.setString(4,p.getUniqueId().toString());
                                                     ps.executeUpdate();
 
