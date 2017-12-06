@@ -5,6 +5,8 @@ import net.md_5.bungee.api.ChatColor;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
 import net.wrathofdungeons.bungeedungeon.MotdManager;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
+import net.wrathofdungeons.bungeedungeon.ban.Ban;
+import net.wrathofdungeons.bungeedungeon.ban.BanReason;
 import net.wrathofdungeons.bungeedungeon.users.PlayerUtilities;
 import net.wrathofdungeons.bungeedungeon.users.Rank;
 
@@ -33,6 +35,9 @@ public class ReloadCachesTask implements Runnable {
 
             BungeeDungeon.WHITELIST.clear();
 
+            BanReason.init();
+            Ban.STORAGE.clear();
+
             try {
                 PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("SELECT * FROM `whitelist`");
                 ResultSet rs = ps.executeQuery();
@@ -47,7 +52,7 @@ public class ReloadCachesTask implements Runnable {
                 e.printStackTrace();
             }
 
-            BungeeDungeon.createStaffMessage(ChatColor.GRAY + "[Staff] " + ChatColor.GOLD + "The cache has been reloaded.", Rank.ADMIN);
+            //BungeeDungeon.createStaffMessage(ChatColor.GRAY + "[Staff] " + ChatColor.GOLD + "The cache has been reloaded.", Rank.ADMIN);
         });
 
         BungeeDungeon.getInstance().getProxy().getScheduler().schedule(BungeeDungeon.getInstance(),this,delayInMinutes, TimeUnit.MINUTES);

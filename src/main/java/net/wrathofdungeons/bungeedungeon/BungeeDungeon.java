@@ -11,6 +11,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import net.wrathofdungeons.bungeedungeon.ban.BanReason;
 import net.wrathofdungeons.bungeedungeon.cmd.*;
 import net.wrathofdungeons.bungeedungeon.listener.*;
 import net.wrathofdungeons.bungeedungeon.tasks.ReloadCachesTask;
@@ -44,6 +45,7 @@ public class BungeeDungeon extends Plugin {
         }
 
         motdManager.loadFromDatabase();
+        BanReason.init();
 
         registerListeners();
         registerCommands();
@@ -66,6 +68,7 @@ public class BungeeDungeon extends Plugin {
         getProxy().getPluginManager().registerCommand(this,new CallGlobalLoginCommand());
         getProxy().getPluginManager().registerCommand(this,new FriendCommand());
         getProxy().getPluginManager().registerCommand(this,new GuildActionCommand());
+        getProxy().getPluginManager().registerCommand(this,new HandlePunishmentCommand());
         getProxy().getPluginManager().registerCommand(this,new MessageCommand());
         getProxy().getPluginManager().registerCommand(this,new ReloadSettingsCommand());
         getProxy().getPluginManager().registerCommand(this,new ReplyCommand());

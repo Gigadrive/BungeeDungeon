@@ -6,12 +6,14 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
+import net.wrathofdungeons.bungeedungeon.ban.Ban;
 import net.wrathofdungeons.bungeedungeon.users.BungeeUser;
 import net.wrathofdungeons.bungeedungeon.users.PlayerUtilities;
 import net.wrathofdungeons.bungeedungeon.vpn.VPNCheckResult;
 import net.wrathofdungeons.bungeedungeon.vpn.VPNCheckUtil;
 
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 public class LoginListener implements Listener {
@@ -30,7 +32,13 @@ public class LoginListener implements Listener {
                 }
             }
 
-            // TODO: Add ban check
+            Ban ban = Ban.getBan(uuid);
+            if(ban != null && ban.isActive()){
+                e.setCancelReason(ban.getDisconnectMessage());
+                e.setCancelled(true);
+
+                return;
+            }
 
             if(!e.isCancelled()){
                 double vpnvalue = 0;
