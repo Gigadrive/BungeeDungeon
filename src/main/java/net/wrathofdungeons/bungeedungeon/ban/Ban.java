@@ -153,13 +153,33 @@ public class Ban {
                             "\n" +
                             ChatColor.DARK_AQUA + "Appeal at " + ChatColor.GOLD + "wrathofdungeons.net";
         } else {
-            long seconds = new Timestamp(System.currentTimeMillis()).getTime()-getEndDate().getTime() / 1000;
+            /*long seconds = new Timestamp(System.currentTimeMillis()).getTime()-getEndDate().getTime() / 1000;
             long minutes = seconds / 60;
             long hours = minutes / 60;
             long days = hours / 24;
-            String time = days + " days " + hours % 24 + " hours " + minutes % 60 + " minutes " + seconds % 60 + " seconds";
+            String time = days + " days " + hours % 24 + " hours " + minutes % 60 + " minutes " + seconds % 60 + " seconds";*/
 
-             return "" +
+            long different = new Timestamp(System.currentTimeMillis()).getTime()-getEndDate().getTime();
+
+            long secondsInMilli = 1000;
+            long minutesInMilli = secondsInMilli * 60;
+            long hoursInMilli = minutesInMilli * 60;
+            long daysInMilli = hoursInMilli * 24;
+
+            long elapsedDays = different / daysInMilli;
+            different = different % daysInMilli;
+
+            long elapsedHours = different / hoursInMilli;
+            different = different % hoursInMilli;
+
+            long elapsedMinutes = different / minutesInMilli;
+            different = different % minutesInMilli;
+
+            long elapsedSeconds = different / secondsInMilli;
+
+            String time = elapsedDays + " days " + elapsedHours + " hours " + elapsedMinutes + " minutes " + elapsedSeconds + " seconds";
+
+            return "" +
                             ChatColor.WHITE + "Your account has been banned\n" +
                             ChatColor.WHITE + "from the Wrath of Dungeons network!\n" +
                             "\n" +
