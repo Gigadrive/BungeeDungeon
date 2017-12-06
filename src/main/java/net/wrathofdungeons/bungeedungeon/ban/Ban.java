@@ -3,9 +3,11 @@ package net.wrathofdungeons.bungeedungeon.ban;
 import net.md_5.bungee.api.ChatColor;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
+import net.wrathofdungeons.bungeedungeon.users.PlayerUtilities;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -166,16 +168,16 @@ public class Ban {
             long hoursInMilli = minutesInMilli * 60;
             long daysInMilli = hoursInMilli * 24;
 
-            long elapsedDays = different / daysInMilli;
+            long elapsedDays = (different / daysInMilli)/-1;
             different = different % daysInMilli;
 
-            long elapsedHours = different / hoursInMilli;
+            long elapsedHours = (different / hoursInMilli)/-1;
             different = different % hoursInMilli;
 
-            long elapsedMinutes = different / minutesInMilli;
+            long elapsedMinutes = (different / minutesInMilli)/-1;
             different = different % minutesInMilli;
 
-            long elapsedSeconds = different / secondsInMilli;
+            long elapsedSeconds = (different / secondsInMilli)/-1;
 
             String time = elapsedDays + " days " + elapsedHours + " hours " + elapsedMinutes + " minutes " + elapsedSeconds + " seconds";
 
@@ -187,6 +189,25 @@ public class Ban {
                             ChatColor.DARK_RED + "Expiry: " + ChatColor.RED + time + "\n" +
                             "\n" +
                             ChatColor.DARK_AQUA + "Appeal at " + ChatColor.GOLD + "wrathofdungeons.net";
+        }
+    }
+
+    public void unban(UUID staff, String reason) throws SQLException {
+        if(active){
+            active = false;
+            STORAGE.remove(this);
+
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            String name = PlayerUtilities.getNameFromUUID(uuid);
+
+            PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("UPDATE `bans` SET `active` = ?, `unban.staff` = ?, `unban.time` = ?, `unban.reason` = ? WHERE `id` = ?");
+            ps.setBoolean(1,active);
+            ps.setString(2,staff != null ? staff.toString() : null);
+            ps.setTimestamp(3,now);
+            ps.setString(4,reason);
+            ps.setInt(5,id);
+            ps.executeUpdate();
+            ps.close();
         }
     }
 

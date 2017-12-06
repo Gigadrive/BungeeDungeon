@@ -74,6 +74,7 @@ public class BungeeDungeon extends Plugin {
         getProxy().getPluginManager().registerCommand(this,new ReplyCommand());
         getProxy().getPluginManager().registerCommand(this,new ServerCommand());
         getProxy().getPluginManager().registerCommand(this,new StaffChatCommand());
+        getProxy().getPluginManager().registerCommand(this,new UnbanCommand());
     }
 
     public static boolean isWhitelisted(UUID uuid){
