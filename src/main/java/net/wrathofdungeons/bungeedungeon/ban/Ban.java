@@ -171,10 +171,10 @@ public class Ban {
     }
 
     private void checkExpiry(){
-        if(isActive()){
+        if(active){
             Timestamp now = new Timestamp(System.currentTimeMillis());
 
-            if(getEndDate() != null && now.after(getEndDate())){
+            if(endDate != null && now.after(endDate)){
                 active = false;
                 STORAGE.remove(this);
 
@@ -182,7 +182,7 @@ public class Ban {
                     try {
                         PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("UPDATE `bans` SET `active` = ? WHERE `id` = ?");
                         ps.setBoolean(1,active);
-                        ps.setInt(2,getId());
+                        ps.setInt(2,id);
                         ps.executeUpdate();
                         ps.close();
                     } catch(Exception e){
