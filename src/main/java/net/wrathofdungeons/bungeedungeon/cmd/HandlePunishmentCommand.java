@@ -44,108 +44,110 @@ public class HandlePunishmentCommand extends Command {
                             UUID uuid = PlayerUtilities.getUUIDFromName(name);
 
                             if(uuid != null){
-                                if(Util.isValidInteger(args[2])){
-                                    BanReason banReason = BanReason.getBanReason(Integer.parseInt(args[2]));
+                                Rank rank = PlayerUtilities.getRankFromUUID(uuid);
 
-                                    if(banReason != null){
-                                        if(banReason.getTypeOfPunishment() == BanReason.PunishmentType.BAN || banReason.getTypeOfPunishment() == BanReason.PunishmentType.PERMBAN){
-                                            Ban ban = Ban.getBan(uuid);
-                                            if(ban == null || !ban.isActive()){
-                                                Rank rank = PlayerUtilities.getRankFromUUID(uuid);
+                                if(u.hasPermission(rank)){
+                                    if(Util.isValidInteger(args[2])){
+                                        BanReason banReason = BanReason.getBanReason(Integer.parseInt(args[2]));
 
-                                                PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("INSERT INTO `bans` (`uuid`,`reason`,`endDate`,`staff`) VALUES(?,?,?,?);", Statement.RETURN_GENERATED_KEYS);
-                                                ps.setString(1,uuid.toString());
+                                        if(banReason != null){
+                                            if(banReason.getTypeOfPunishment() == BanReason.PunishmentType.BAN || banReason.getTypeOfPunishment() == BanReason.PunishmentType.PERMBAN){
+                                                Ban ban = Ban.getBan(uuid);
+                                                if(ban == null || !ban.isActive()){
+                                                    PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("INSERT INTO `bans` (`uuid`,`reason`,`endDate`,`staff`) VALUES(?,?,?,?);", Statement.RETURN_GENERATED_KEYS);
+                                                    ps.setString(1,uuid.toString());
 
-                                                int time = banReason.getTimeValue();
-                                                Timestamp now = new Timestamp(System.currentTimeMillis());
-                                                Calendar cal = Calendar.getInstance();
-                                                cal.setTimeInMillis(now.getTime());
+                                                    int time = banReason.getTimeValue();
+                                                    Timestamp now = new Timestamp(System.currentTimeMillis());
+                                                    Calendar cal = Calendar.getInstance();
+                                                    cal.setTimeInMillis(now.getTime());
 
-                                                if(banReason.getTimeUnit().equalsIgnoreCase("SECONDS")){
-                                                    cal.add(Calendar.SECOND,time);
-                                                } else if(banReason.getTimeUnit().equalsIgnoreCase("MINUTES")){
-                                                    cal.add(Calendar.MINUTE,time);
-                                                } else if(banReason.getTimeUnit().equalsIgnoreCase("HOURS")){
-                                                    cal.add(Calendar.HOUR,time);
-                                                } else if(banReason.getTimeUnit().equalsIgnoreCase("DAYS")){
-                                                    cal.add(Calendar.HOUR,time*24);
-                                                } else if(banReason.getTimeUnit().equalsIgnoreCase("WEEKS")){
-                                                    cal.add(Calendar.HOUR,time*24*7);
-                                                } else if(banReason.getTimeUnit().equalsIgnoreCase("MONTHS")){
-                                                    cal.add(Calendar.MONTH,time);
-                                                } else if(banReason.getTimeUnit().equalsIgnoreCase("YEARS")){
-                                                    cal.add(Calendar.YEAR,time);
-                                                }
+                                                    if(banReason.getTimeUnit().equalsIgnoreCase("SECONDS")){
+                                                        cal.add(Calendar.SECOND,time);
+                                                    } else if(banReason.getTimeUnit().equalsIgnoreCase("MINUTES")){
+                                                        cal.add(Calendar.MINUTE,time);
+                                                    } else if(banReason.getTimeUnit().equalsIgnoreCase("HOURS")){
+                                                        cal.add(Calendar.HOUR,time);
+                                                    } else if(banReason.getTimeUnit().equalsIgnoreCase("DAYS")){
+                                                        cal.add(Calendar.HOUR,time*24);
+                                                    } else if(banReason.getTimeUnit().equalsIgnoreCase("WEEKS")){
+                                                        cal.add(Calendar.HOUR,time*24*7);
+                                                    } else if(banReason.getTimeUnit().equalsIgnoreCase("MONTHS")){
+                                                        cal.add(Calendar.MONTH,time);
+                                                    } else if(banReason.getTimeUnit().equalsIgnoreCase("YEARS")){
+                                                        cal.add(Calendar.YEAR,time);
+                                                    }
 
-                                                ps.setInt(2,banReason.getId());
-                                                ps.setTimestamp(3,new Timestamp(cal.getTime().getTime()));
-                                                ps.setString(4,p.getUniqueId().toString());
-                                                ps.executeUpdate();
+                                                    ps.setInt(2,banReason.getId());
+                                                    ps.setTimestamp(3,new Timestamp(cal.getTime().getTime()));
+                                                    ps.setString(4,p.getUniqueId().toString());
+                                                    ps.executeUpdate();
 
-                                                ResultSet rs = ps.getGeneratedKeys();
-                                                int banID = -1;
-                                                if(rs.first()) banID = rs.getInt(1);
+                                                    ResultSet rs = ps.getGeneratedKeys();
+                                                    int banID = -1;
+                                                    if(rs.first()) banID = rs.getInt(1);
 
-                                                MySQLManager.getInstance().closeResources(rs,ps);
+                                                    MySQLManager.getInstance().closeResources(rs,ps);
 
-                                                if(banID > -1){
-                                                    Ban b = new Ban(banID);
+                                                    if(banID > -1){
+                                                        Ban b = new Ban(banID);
 
-                                                    if(b.getBanReason() == banReason){
-                                                        p.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "New ban rule created! ID: #" + banID));
-                                                        BungeeDungeon.createStaffMessage(Rank.MODERATOR,u.getRank().getColor() + p.getName() + " " + ChatColor.GREEN + "has punished " + rank.getColor() + name + " " + ChatColor.GREEN + "with reason " + ChatColor.GRAY + b.getBanReason().getName() + ChatColor.GREEN + ".");
+                                                        if(b.getBanReason() == banReason){
+                                                            p.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "New ban rule created! ID: #" + banID));
+                                                            BungeeDungeon.createStaffMessage(Rank.MODERATOR,u.getRank().getColor() + p.getName() + " " + ChatColor.GREEN + "has punished " + rank.getColor() + name + " " + ChatColor.GREEN + "with reason " + ChatColor.GRAY + b.getBanReason().getName() + ChatColor.GREEN + ".");
 
-                                                        ProxiedPlayer p2 = BungeeDungeon.getInstance().getProxy().getPlayer(name);
+                                                            ProxiedPlayer p2 = BungeeDungeon.getInstance().getProxy().getPlayer(name);
 
-                                                        if(p2 != null)
-                                                            p2.disconnect(TextComponent.fromLegacyText(ban.getDisconnectMessage()));
+                                                            if(p2 != null)
+                                                                p2.disconnect(TextComponent.fromLegacyText(ban.getDisconnectMessage()));
+                                                        } else {
+                                                            p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An error occurred."));
+                                                        }
                                                     } else {
                                                         p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An error occurred."));
                                                     }
                                                 } else {
-                                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An error occurred."));
+                                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "That player is already banned."));
                                                 }
-                                            } else {
-                                                p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "That player is already banned."));
-                                            }
-                                        } else if(banReason.getTypeOfPunishment() == BanReason.PunishmentType.KICK){
-                                            ProxiedPlayer p2 = BungeeDungeon.getInstance().getProxy().getPlayer(name);
+                                            } else if(banReason.getTypeOfPunishment() == BanReason.PunishmentType.KICK){
+                                                ProxiedPlayer p2 = BungeeDungeon.getInstance().getProxy().getPlayer(name);
 
-                                            if(p2 != null){
-                                                Rank rank = PlayerUtilities.getRankFromUUID(uuid);
+                                                if(p2 != null){
+                                                    PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("INSERT INTO `kicks` (`uuid`,`staff`,`reason`,`server`) VALUES(?,?,?,?);");
+                                                    ps.setString(1,uuid.toString());
+                                                    ps.setString(2,p.getUniqueId().toString());
+                                                    ps.setInt(3,banReason.getId());
+                                                    ps.setString(4, CloudAPI.getInstance().getOnlinePlayer(p2.getUniqueId()).getServer());
+                                                    ps.executeUpdate();
 
-                                                PreparedStatement ps = MySQLManager.getInstance().getConnection().prepareStatement("INSERT INTO `kicks` (`uuid`,`staff`,`reason`,`server`) VALUES(?,?,?,?);");
-                                                ps.setString(1,uuid.toString());
-                                                ps.setString(2,p.getUniqueId().toString());
-                                                ps.setInt(3,banReason.getId());
-                                                ps.setString(4, CloudAPI.getInstance().getOnlinePlayer(p2.getUniqueId()).getServer());
-                                                ps.executeUpdate();
+                                                    ResultSet rs = ps.getGeneratedKeys();
+                                                    int kickID = -1;
+                                                    if(rs.first()) kickID = rs.getInt(1);
 
-                                                ResultSet rs = ps.getGeneratedKeys();
-                                                int kickID = -1;
-                                                if(rs.first()) kickID = rs.getInt(1);
+                                                    MySQLManager.getInstance().closeResources(rs,ps);
 
-                                                MySQLManager.getInstance().closeResources(rs,ps);
+                                                    if(kickID > -1){
+                                                        p.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "New kick rule created! ID: #" + kickID));
+                                                        BungeeDungeon.createStaffMessage(Rank.MODERATOR,u.getRank().getColor() + p.getName() + " " + ChatColor.GREEN + "has punished " + rank.getColor() + name + " " + ChatColor.GREEN + "with reason " + ChatColor.GRAY + banReason.getName() + ChatColor.GREEN + ".");
 
-                                                if(kickID > -1){
-                                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.GREEN + "New kick rule created! ID: #" + kickID));
-                                                    BungeeDungeon.createStaffMessage(Rank.MODERATOR,u.getRank().getColor() + p.getName() + " " + ChatColor.GREEN + "has punished " + rank.getColor() + name + " " + ChatColor.GREEN + "with reason " + ChatColor.GRAY + banReason.getName() + ChatColor.GREEN + ".");
-
-                                                    p2.disconnect(TextComponent.fromLegacyText("" +
-                                                            ChatColor.WHITE + "Your account has been kicked\n" +
-                                                            ChatColor.WHITE + "from the Wrath of Dungeons network!\n" +
-                                                            "\n" +
-                                                            ChatColor.DARK_RED + "Reason: " + ChatColor.RED + banReason.getName()));
+                                                        p2.disconnect(TextComponent.fromLegacyText("" +
+                                                                ChatColor.WHITE + "Your account has been kicked\n" +
+                                                                ChatColor.WHITE + "from the Wrath of Dungeons network!\n" +
+                                                                "\n" +
+                                                                ChatColor.DARK_RED + "Reason: " + ChatColor.RED + banReason.getName()));
+                                                    } else {
+                                                        p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An error occurred."));
+                                                    }
                                                 } else {
-                                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "An error occurred."));
+                                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "That player is not online."));
                                                 }
-                                            } else {
-                                                p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "That player is not online."));
                                             }
+                                        } else {
+                                            p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Error: Unknown ban reason."));
                                         }
-                                    } else {
-                                        p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Error: Unknown ban reason."));
                                     }
+                                } else {
+                                    p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "You are not allowed to punish that player."));
                                 }
                             }
                         } catch(Exception e){
