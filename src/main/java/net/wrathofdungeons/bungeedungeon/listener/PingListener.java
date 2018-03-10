@@ -1,7 +1,5 @@
 package net.wrathofdungeons.bungeedungeon.listener;
 
-import de.dytanic.cloudnet.api.CloudAPI;
-import de.dytanic.cloudnet.lib.CloudNetwork;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.event.ProxyPingEvent;
