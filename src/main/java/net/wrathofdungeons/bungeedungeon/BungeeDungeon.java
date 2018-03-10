@@ -70,6 +70,7 @@ public class BungeeDungeon extends Plugin {
         getProxy().getPluginManager().registerCommand(this,new GuildActionCommand());
         getProxy().getPluginManager().registerCommand(this,new HandlePunishmentCommand());
         getProxy().getPluginManager().registerCommand(this,new MessageCommand());
+        getProxy().getPluginManager().registerCommand(this,new PingCommand());
         getProxy().getPluginManager().registerCommand(this,new ReloadSettingsCommand());
         getProxy().getPluginManager().registerCommand(this,new ReplyCommand());
         getProxy().getPluginManager().registerCommand(this,new ServerCommand());
