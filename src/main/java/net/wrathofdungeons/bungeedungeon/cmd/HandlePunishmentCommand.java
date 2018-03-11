@@ -1,6 +1,6 @@
 package net.wrathofdungeons.bungeedungeon.cmd;
 
-import de.dytanic.cloudnet.api.CloudNetAPI;
+import de.dytanic.cloudnet.api.CloudAPI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -116,7 +116,7 @@ public class HandlePunishmentCommand extends Command {
                                                     ps.setString(1,uuid.toString());
                                                     ps.setString(2,p.getUniqueId().toString());
                                                     ps.setInt(3,banReason.getId());
-                                                    ps.setString(4, CloudNetAPI.getInstance().getOnlinePlayer(p2.getUniqueId()).getServer());
+                                                    ps.setString(4, CloudAPI.getInstance().getOnlinePlayer(p2.getUniqueId()).getServer());
                                                     ps.executeUpdate();
 
                                                     ResultSet rs = ps.getGeneratedKeys();

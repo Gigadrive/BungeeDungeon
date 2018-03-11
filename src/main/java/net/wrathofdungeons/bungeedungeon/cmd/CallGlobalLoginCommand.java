@@ -1,7 +1,7 @@
 package net.wrathofdungeons.bungeedungeon.cmd;
 
-import de.dytanic.cloudnet.api.CloudNetAPI;
-import de.dytanic.cloudnet.network.ServerInfo;
+import de.dytanic.cloudnet.api.CloudAPI;
+import de.dytanic.cloudnet.lib.server.info.ServerInfo;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -32,9 +32,8 @@ public class CallGlobalLoginCommand extends Command {
 
                         ArrayList<String> servers = new ArrayList<String>();
 
-                        for(String id : CloudNetAPI.getInstance().getServers("Game")){
-                            ServerInfo info = CloudNetAPI.getInstance().getServerInfo(id);
-                            net.md_5.bungee.api.config.ServerInfo server = BungeeDungeon.getInstance().getProxy().getServerInfo(id);
+                        for(ServerInfo info : CloudAPI.getInstance().getServers("Game")){
+                            net.md_5.bungee.api.config.ServerInfo server = BungeeDungeon.getInstance().getProxy().getServerInfo(info.getServiceId().getServerId());
 
                             if(server != null) if(server.getName() != null && !servers.contains(server.getName())){
                                 BungeeDungeon.sendToBukkit(server,"callGlobalLogin",p.getUniqueId().toString(),String.valueOf(level),className);
@@ -42,9 +41,8 @@ public class CallGlobalLoginCommand extends Command {
                             }
                         }
 
-                        for(String id : CloudNetAPI.getInstance().getServers("Test")){
-                            ServerInfo info = CloudNetAPI.getInstance().getServerInfo(id);
-                            net.md_5.bungee.api.config.ServerInfo server = BungeeDungeon.getInstance().getProxy().getServerInfo(id);
+                        for(ServerInfo info : CloudAPI.getInstance().getServers("Test")){
+                            net.md_5.bungee.api.config.ServerInfo server = BungeeDungeon.getInstance().getProxy().getServerInfo(info.getServiceId().getServerId());
 
                             if(server != null) if(server.getName() != null && !servers.contains(server.getName())){
                                 BungeeDungeon.sendToBukkit(server,"callGlobalLogin",p.getUniqueId().toString(),String.valueOf(level),className);
