@@ -35,7 +35,6 @@ public class ConnectListener implements Listener {
 
             if(BungeeUser.isLoaded(p.getUniqueId())){
                 BungeeUser u = BungeeUser.get(p.getUniqueId());
-                u.setProxiedPlayer(p);
                 u.callJoin();
             }
         }

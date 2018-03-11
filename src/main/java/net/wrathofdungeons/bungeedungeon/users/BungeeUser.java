@@ -3,6 +3,7 @@ package net.wrathofdungeons.bungeedungeon.users;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
 import net.wrathofdungeons.bungeedungeon.DefaultFontInfo;
@@ -47,7 +48,6 @@ public class BungeeUser {
     }
 
     private UUID uuid;
-    private ProxiedPlayer p;
     private Rank rank;
     private ArrayList<String> friends;
     private ArrayList<String> friendRequests;
@@ -149,7 +149,7 @@ public class BungeeUser {
     }
 
     public String sendCenteredMessage(String message, boolean send){
-        ProxiedPlayer player = p;
+        ProxiedPlayer player = getProxiedPlayer();
         int CENTER_PX = 154;
         int MAX_PX = 250;
 
@@ -195,7 +195,7 @@ public class BungeeUser {
             compensated += spaceLength;
         }
         String s = sb.toString() + message;
-        if(send) player.sendMessage(s);
+        if(send) player.sendMessage(TextComponent.fromLegacyText(s));
         if(toSendAfter != null) sendCenteredMessage(toSendAfter);
         return s;
     }
@@ -217,12 +217,7 @@ public class BungeeUser {
     }
 
     public void reloadSpigotFriends(){
-        if(p != null && p.getServer() != null) BungeeDungeon.sendToBukkit(p.getServer(),"reloadFriends",p.getName());
-    }
-
-    public void setProxiedPlayer(ProxiedPlayer p){
-        this.p = p;
-        saveData();
+        if(getProxiedPlayer() != null && getProxiedPlayer().getServer() != null) BungeeDungeon.sendToBukkit(getProxiedPlayer().getServer(),"reloadFriends",getProxiedPlayer().getName());
     }
 
     public UserSettingsManager getSettings() {
@@ -230,7 +225,7 @@ public class BungeeUser {
     }
 
     public ProxiedPlayer getProxiedPlayer() {
-        return p;
+        return BungeeDungeon.getInstance().getProxy().getPlayer(uuid);
     }
 
     public Rank getRank() {
@@ -258,11 +253,13 @@ public class BungeeUser {
     }
 
     public void clearCaches(){
-        PlayerUtilities.UUID_RANK_CACHE.remove(p.getUniqueId());
-        PlayerUtilities.NAME_UUID_CACHE.remove(p.getName());
-        PlayerUtilities.UUID_NAME_CACHE.remove(p.getUniqueId());
-        PlayerUtilities.UUID_FRIENDREQUESTS_CACHE.remove(p.getUniqueId());
-        PlayerUtilities.UUID_SETTINGS_CACHE.remove(p.getUniqueId());
+        if(getProxiedPlayer() == null) return;
+
+        PlayerUtilities.UUID_RANK_CACHE.remove(getProxiedPlayer().getUniqueId());
+        PlayerUtilities.NAME_UUID_CACHE.remove(getProxiedPlayer().getName());
+        PlayerUtilities.UUID_NAME_CACHE.remove(getProxiedPlayer().getUniqueId());
+        PlayerUtilities.UUID_FRIENDREQUESTS_CACHE.remove(getProxiedPlayer().getUniqueId());
+        PlayerUtilities.UUID_SETTINGS_CACHE.remove(getProxiedPlayer().getUniqueId());
     }
 
     public void callJoin(){
@@ -270,13 +267,14 @@ public class BungeeUser {
             joined = true;
 
             clearCaches();
+            saveData();
 
-            p.setDisplayName(Util.limitString(getRank().getColor() + p.getName(),16));
+            getProxiedPlayer().setDisplayName(Util.limitString(getRank().getColor() + getProxiedPlayer().getName(),16));
 
             if(getFriendRequests().size() == 1){
-                p.sendMessage(new ComponentBuilder(ChatColor.AQUA + "You have " + ChatColor.YELLOW + getFriendRequests().size() + ChatColor.AQUA + " open friend request. Click here to review it.").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend requests")).create());
+                getProxiedPlayer().sendMessage(new ComponentBuilder(ChatColor.AQUA + "You have " + ChatColor.YELLOW + getFriendRequests().size() + ChatColor.AQUA + " open friend request. Click here to review it.").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend requests")).create());
             } else if(getFriendRequests().size() > 1){
-                p.sendMessage(new ComponentBuilder(ChatColor.AQUA + "You have " + ChatColor.YELLOW + getFriendRequests().size() + ChatColor.AQUA + " open friend requests. Click here to review them.").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend requests")).create());
+                getProxiedPlayer().sendMessage(new ComponentBuilder(ChatColor.AQUA + "You have " + ChatColor.YELLOW + getFriendRequests().size() + ChatColor.AQUA + " open friend requests. Click here to review them.").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend requests")).create());
             }
         }
     }
