@@ -1,11 +1,16 @@
 package net.wrathofdungeons.bungeedungeon.listener;
 
+import io.netty.channel.Channel;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
+import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.wrathofdungeons.bungeedungeon.BungeeDungeon;
+import net.wrathofdungeons.bungeedungeon.ConnectionEncoder;
 import net.wrathofdungeons.bungeedungeon.MySQLManager;
+import net.wrathofdungeons.bungeedungeon.Reflect;
 import net.wrathofdungeons.bungeedungeon.ban.Ban;
 import net.wrathofdungeons.bungeedungeon.users.BungeeUser;
 import net.wrathofdungeons.bungeedungeon.users.PlayerUtilities;
@@ -77,6 +82,17 @@ public class LoginListener implements Listener {
         } else {
             e.setCancelReason(ChatColor.RED + "No UUID submitted.");
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPostLogin(PostLoginEvent e){
+        try {
+            ProxiedPlayer p = e.getPlayer();
+            Channel ch = (Channel) Reflect.get(Reflect.get(p,"ch"),"ch");
+            ch.pipeline().addAfter("packet-encoder","wodEncoder",new ConnectionEncoder(p));
+        } catch(Exception e1){
+            e1.printStackTrace();
         }
     }
 }

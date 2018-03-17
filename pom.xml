@@ -33,19 +33,17 @@
     </build>
 
     <dependencies>
-        <dependency>
+        <!--<dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
             <version>1.8-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
-        </dependency>
+        </dependency>-->
         <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
-            <version>1.8-SNAPSHOT</version>
-            <type>javadoc</type>
-            <scope>provided</scope>
+            <groupId>eu.thechest</groupId>
+            <artifactId>ChestCord</artifactId>
+            <version>1.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
