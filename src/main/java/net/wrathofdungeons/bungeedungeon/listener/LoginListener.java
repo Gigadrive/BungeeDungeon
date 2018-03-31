@@ -18,7 +18,6 @@ import net.wrathofdungeons.bungeedungeon.vpn.VPNCheckResult;
 import net.wrathofdungeons.bungeedungeon.vpn.VPNCheckUtil;
 
 import java.sql.PreparedStatement;
-import java.sql.Timestamp;
 import java.util.UUID;
 
 public class LoginListener implements Listener {
@@ -89,8 +88,11 @@ public class LoginListener implements Listener {
     public void onPostLogin(PostLoginEvent e){
         try {
             ProxiedPlayer p = e.getPlayer();
-            Channel ch = (Channel) Reflect.get(Reflect.get(p,"ch"),"ch");
-            ch.pipeline().addAfter("packet-encoder","wodEncoder",new ConnectionEncoder(p));
+
+            if (BungeeDungeon.ENABLE_LOADING_SCREEN_REMOVER) {
+                Channel ch = (Channel) Reflect.get(Reflect.get(p, "ch"), "ch");
+                ch.pipeline().addAfter("packet-encoder", "wodEncoder", new ConnectionEncoder(p));
+            }
         } catch(Exception e1){
             e1.printStackTrace();
         }

@@ -19,12 +19,16 @@ import net.wrathofdungeons.bungeedungeon.users.BungeeUser;
 import net.wrathofdungeons.bungeedungeon.users.Rank;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.UUID;
 
 public class BungeeDungeon extends Plugin {
     private static BungeeDungeon instance;
     private Configuration config;
     private static MotdManager motdManager;
+
+    public static boolean ENABLE_LOADING_SCREEN_REMOVER = false;
 
     public static boolean WHITELIST_ENABLED = true;
     public static ArrayList<UUID> WHITELIST = new ArrayList<UUID>();
