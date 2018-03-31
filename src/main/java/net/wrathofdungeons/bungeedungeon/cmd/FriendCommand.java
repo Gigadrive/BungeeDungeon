@@ -18,7 +18,6 @@ import net.wrathofdungeons.bungeedungeon.users.Rank;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -291,7 +290,7 @@ public class FriendCommand extends Command {
                                     }
 
                                     Collections.sort(friends, (o1, o2) -> {
-                                        return Util.convertBooleanToInteger(ProxyServer.getInstance().getPlayer(o1) != null).compareTo(Util.convertBooleanToInteger(ProxyServer.getInstance().getPlayer(o2) != null));
+                                        return Util.convertBooleanToInteger(ProxyServer.getInstance().getPlayer(o2) != null).compareTo(Util.convertBooleanToInteger(ProxyServer.getInstance().getPlayer(o1) != null));
                                     });
 
                                     int sizePerPage = 36;
