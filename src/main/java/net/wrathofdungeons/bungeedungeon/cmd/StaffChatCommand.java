@@ -30,7 +30,7 @@ public class StaffChatCommand extends Command {
                         }
                         String message = sb.toString().substring(1);
 
-                        BungeeDungeon.createStaffMessage(ChatColor.YELLOW + "[" + u.getRank().getColor() + p.getName() + ChatColor.YELLOW + "] " + ChatColor.GRAY + message, Rank.MODERATOR);
+                        BungeeDungeon.createStaffMessage(ChatColor.DARK_RED + "[" + u.getRank().getColor() + p.getName() + ChatColor.DARK_RED + "] " + ChatColor.RED + message, Rank.MODERATOR);
                     } else {
                         p.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Please enter a message."));
                     }
@@ -46,7 +46,7 @@ public class StaffChatCommand extends Command {
                 }
                 String message = sb.toString().substring(1);
 
-                BungeeDungeon.createStaffMessage(ChatColor.YELLOW + "[CONSOLE] " + ChatColor.GRAY + message, Rank.MODERATOR);
+                BungeeDungeon.createStaffMessage(ChatColor.DARK_RED + "[CONSOLE] " + ChatColor.RED + message, Rank.MODERATOR);
             } else {
                 sender.sendMessage(TextComponent.fromLegacyText(ChatColor.RED + "Please enter a message."));
             }

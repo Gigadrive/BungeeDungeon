@@ -276,6 +276,28 @@ public class BungeeUser {
             } else if(getFriendRequests().size() > 1){
                 getProxiedPlayer().sendMessage(new ComponentBuilder(ChatColor.AQUA + "You have " + ChatColor.YELLOW + getFriendRequests().size() + ChatColor.AQUA + " open friend requests. Click here to review them.").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/friend requests")).create());
             }
+
+            if (hasPermission(Rank.MODERATOR)) {
+                int onlineStaff = 0;
+                for (ProxiedPlayer p : BungeeDungeon.getInstance().getProxy().getPlayers()) {
+                    if (p != getProxiedPlayer())
+                        if (BungeeUser.isLoaded(p)) {
+                            BungeeUser u = BungeeUser.get(p);
+
+                            if (u.hasPermission(Rank.MODERATOR)) {
+                                onlineStaff++;
+                            }
+                        }
+                }
+
+                BungeeDungeon.createStaffMessage(ChatColor.DARK_RED + "[STAFF] " + getRank().getColor() + getProxiedPlayer().getName() + ChatColor.RED + " is now " + ChatColor.DARK_GREEN + "online" + ChatColor.RED + ".", Rank.MODERATOR);
+
+                if (onlineStaff == 1) {
+                    getProxiedPlayer().sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_RED + "[STAFF] " + ChatColor.RED + "There is currently " + ChatColor.WHITE + String.valueOf(onlineStaff) + ChatColor.RED + " other staff member online."));
+                } else {
+                    getProxiedPlayer().sendMessage(TextComponent.fromLegacyText(ChatColor.DARK_RED + "[STAFF] " + ChatColor.RED + "There are currently " + ChatColor.WHITE + String.valueOf(onlineStaff) + ChatColor.RED + " other staff members online."));
+                }
+            }
         }
     }
 
