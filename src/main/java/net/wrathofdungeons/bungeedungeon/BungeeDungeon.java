@@ -30,7 +30,7 @@ public class BungeeDungeon extends Plugin {
 
     public static boolean ENABLE_LOADING_SCREEN_REMOVER = false;
 
-    public static boolean WHITELIST_ENABLED = true;
+    public static boolean WHITELIST_ENABLED = false;
     public static ArrayList<UUID> WHITELIST = new ArrayList<UUID>();
 
     public static ArrayList<String> ON_SERVER = new ArrayList<String>();
